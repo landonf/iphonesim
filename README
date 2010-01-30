@@ -1,7 +1,13 @@
 A command-line utility for managing the iPhone Simulator.
 
+Usage: iphonesim <options> <command> ...
+Commands:
+  showsdks
+  launch [-d device family] <application path>
+    Supported device families: iPhone iPad
+
 Example:
-    ./iphonesim launch ~/Project/build/Debug-iphonesimulator/Project.app
+    ./iphonesim launch -d iPhone ~/Project/build/Debug-iphonesimulator/Project.app
 
 Author: Landon Fuller <landonf@plausiblelabs.com>
 
