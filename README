@@ -1,4 +1,5 @@
-A command-line utility for managing the iPhone Simulator.
+A command-line utility for managing the iPhone Simulator. Provided as a simple
+example of interfacing with the iPhoneSimulatorRemoteClient API.
 
 Usage: iphonesim <options> <command> ...
 Commands:
