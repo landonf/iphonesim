@@ -3,11 +3,13 @@ A command-line utility for managing the iPhone Simulator.
 Usage: iphonesim <options> <command> ...
 Commands:
   showsdks
-  launch [-d device family] <application path>
-    Supported device families: iPhone iPad
+  launch [options] <application path>
+    Options:
+      -d/--device-family [family]   Supported device families: iPhone iPad
+      -s/--sdk-version [version]    The SDK version (eg, 3.0, 3.1, 3.2)
 
 Example:
-    ./iphonesim launch -d iPhone ~/Project/build/Debug-iphonesimulator/Project.app
+    ./iphonesim launch --device-family iPhone --sdk-version 3.0 ~/Project/build/Debug-iphonesimulator/Project.app
 
 Author: Landon Fuller <landonf@plausiblelabs.com>
 
