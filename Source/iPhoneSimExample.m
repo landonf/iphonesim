@@ -42,7 +42,8 @@
     fprintf(stderr, "Usage: iphonesim <options> <command> ...\n");
     fprintf(stderr, "Commands:\n");
     fprintf(stderr, "  showsdks\n");
-    fprintf(stderr, "  launch <application path>\n");
+    fprintf(stderr, "  launch [-d device family] <application path>\n");
+    fprintf(stderr, "      Supported device families: iPhone iPad\n");
 }
 
 
@@ -83,7 +84,7 @@
 /**
  * Launch the given Simulator binary.
  */
-- (int) launchApp: (NSString *) path {
+- (int) launchApp: (NSString *) path simulatedDeviceFamily: (NSNumber *) simulatedDeviceFamily {
     DTiPhoneSimulatorApplicationSpecifier *appSpec;
     DTiPhoneSimulatorSystemRoot *sdkRoot;
     DTiPhoneSimulatorSessionConfig *config;
@@ -110,6 +111,8 @@
 
     [config setSimulatedApplicationLaunchArgs: [NSArray array]];
     [config setSimulatedApplicationLaunchEnvironment: [NSDictionary dictionary]];
+    if (simulatedDeviceFamily != nil && [config respondsToSelector: @selector(setSimulatedDeviceFamily:)])
+        [config setSimulatedDeviceFamily: simulatedDeviceFamily];
 
     [config setLocalizedClientName: @"iPhoneSimExample"];
 
@@ -141,17 +144,44 @@
         exit([self showSDKs]);
     }
     else if (strcmp(argv[1], "launch") == 0) {
-        /* Requires an additional argument */
+        /* Requires at least one additional argument */
         if (argc < 3) {
             fprintf(stderr, "Missing application path argument\n");
             [self printUsage];
             exit(EXIT_FAILURE);
         }
 
+        /* Parse any arguments */
+        NSNumber *simulatedDeviceFamily = nil;
+        int ch;
+        argc -= 1;
+        argv += 1;
+        while ((ch = getopt(argc, argv, "d:")) != -1) {
+            switch (ch) {
+                case 'd':
+                    if (strcmp(optarg, "iPad") == 0) {
+                        simulatedDeviceFamily = [NSNumber numberWithInt: 2];
+                    } else if (strcmp(optarg, "iPhone") == 0) {
+                        simulatedDeviceFamily = [NSNumber numberWithInt: 1];
+                    } else {
+                        fprintf(stderr, "Unknown device type: %s\n", optarg);
+                        [self printUsage];
+                        exit(EXIT_FAILURE);
+                    }
+                    break;
+                default:
+                    fprintf(stderr, "Unknown option %s optarg\n", optarg);
+                    [self printUsage];
+                    exit(EXIT_FAILURE);
+            }
+        }
+        argc -= optind;
+        argv += optind;
+
         /* Don't exit, adds to runloop */
-        [self launchApp: [NSString stringWithUTF8String: argv[2]]];
+        [self launchApp: [NSString stringWithUTF8String: argv[0]] simulatedDeviceFamily: simulatedDeviceFamily];
     } else {
-        fprintf(stderr, "Unknow command\n");
+        fprintf(stderr, "Unknown command\n");
         [self printUsage];
         exit(EXIT_FAILURE);
     }

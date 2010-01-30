@@ -66,6 +66,8 @@
     NSString *_simulatedApplicationStdErrPath;
 }
 
++ (NSString *) displayNameForDeviceFamily: (NSNumber *) family;
+
 - (id)simulatedApplicationStdErrPath;
 - (void)setSimulatedApplicationStdErrPath:(id)fp8;
 - (id)simulatedApplicationStdOutPath;
@@ -80,6 +82,8 @@
 - (DTiPhoneSimulatorSystemRoot *) simulatedSystemRoot;
 - (void) setSimulatedSystemRoot: (DTiPhoneSimulatorSystemRoot *) simulatedSystemRoot;
 
+- (NSNumber *) simulatedDeviceFamily;
+- (void) setSimulatedDeviceFamily: (NSNumber *) family;
 
 - (BOOL) simulatedApplicationShouldWaitForDebugger;
 - (void) setSimulatedApplicationShouldWaitForDebugger: (BOOL) waitForDebugger;
