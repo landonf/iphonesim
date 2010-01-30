@@ -27,7 +27,7 @@
 
 #import "iPhoneSimExample.h"
 #import "nsprintf.h"
-
+#import <getopt.h>
 
 /**
  * A simple usage example for the iPhoneSimulatorRemoteClient
@@ -42,8 +42,10 @@
     fprintf(stderr, "Usage: iphonesim <options> <command> ...\n");
     fprintf(stderr, "Commands:\n");
     fprintf(stderr, "  showsdks\n");
-    fprintf(stderr, "  launch [-d device family] <application path>\n");
-    fprintf(stderr, "      Supported device families: iPhone iPad\n");
+    fprintf(stderr, "  launch [options] <application path>\n");
+    fprintf(stderr, "    Options:\n");
+    fprintf(stderr, "      -d/--device-family [family]\tSupported device families: iPhone iPad\n");
+    fprintf(stderr, "      -s/--sdk-version [version]\tThe SDK version (eg, 3.0, 3.1, 3.2)\n");
 }
 
 
@@ -84,7 +86,7 @@
 /**
  * Launch the given Simulator binary.
  */
-- (int) launchApp: (NSString *) path simulatedDeviceFamily: (NSNumber *) simulatedDeviceFamily {
+- (int) launchApp: (NSString *) path sdkVersion: (NSString *) version simulatedDeviceFamily: (NSNumber *) simulatedDeviceFamily {
     DTiPhoneSimulatorApplicationSpecifier *appSpec;
     DTiPhoneSimulatorSystemRoot *sdkRoot;
     DTiPhoneSimulatorSessionConfig *config;
@@ -99,8 +101,17 @@
     }
     nsprintf(@"App Spec: %@\n", appSpec);
 
-    /* Load the default SDK root */
-    sdkRoot = [DTiPhoneSimulatorSystemRoot defaultRoot];
+    /* Load the SDK root */
+    if (version != nil) {
+        sdkRoot = [DTiPhoneSimulatorSystemRoot rootWithSDKVersion: version];
+        if (sdkRoot == nil) {
+            nsprintf(@"Can't find SDK for version %@", version);
+            return EXIT_FAILURE;
+        }
+    } else {
+        sdkRoot = [DTiPhoneSimulatorSystemRoot defaultRoot];
+    }
+
     nsprintf(@"SDK Root: %@\n", sdkRoot);
 
     /* Set up the session configuration */
@@ -152,12 +163,23 @@
         }
 
         /* Parse any arguments */
+        NSString *sdkVersion = nil;
         NSNumber *simulatedDeviceFamily = nil;
         int ch;
         argc -= 1;
         argv += 1;
-        while ((ch = getopt(argc, argv, "d:")) != -1) {
+
+        static struct option longopts[] = {
+             { "device-family", required_argument,     NULL,    'd' },
+             { "sdk-version",   required_argument,     NULL,    's'  },
+             { NULL,            0,                     NULL,     0  }
+        };
+
+        while ((ch = getopt_long(argc, argv, "s:d:", longopts, NULL)) != -1) {
             switch (ch) {
+                case 's':
+                    sdkVersion = [NSString stringWithUTF8String: optarg];
+                    break;
                 case 'd':
                     if (strcmp(optarg, "iPad") == 0) {
                         simulatedDeviceFamily = [NSNumber numberWithInt: 2];
@@ -179,7 +201,7 @@
         argv += optind;
 
         /* Don't exit, adds to runloop */
-        [self launchApp: [NSString stringWithUTF8String: argv[0]] simulatedDeviceFamily: simulatedDeviceFamily];
+        [self launchApp: [NSString stringWithUTF8String: argv[0]] sdkVersion: sdkVersion simulatedDeviceFamily: simulatedDeviceFamily];
     } else {
         fprintf(stderr, "Unknown command\n");
         [self printUsage];

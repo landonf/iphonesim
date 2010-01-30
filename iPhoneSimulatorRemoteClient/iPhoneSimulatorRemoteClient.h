@@ -39,8 +39,9 @@
 
 + (id) defaultRoot;
 
-+ (id)rootWithSDKPath:(id)fp8;
-+ (id)rootWithSDKVersion:(id)fp8;
++ (id)rootWithSDKPath:(NSString *) path;
++ (id)rootWithSDKVersion:(NSString *)version;
+
 + (NSArray *) knownRoots;
 - (id)initWithSDKPath:(id)fp8;
 - (id)sdkDisplayName;
