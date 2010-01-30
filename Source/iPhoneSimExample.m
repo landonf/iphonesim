@@ -96,7 +96,7 @@
     /* Create the app specifier */
     appSpec = [DTiPhoneSimulatorApplicationSpecifier specifierWithApplicationPath: path];
     if (appSpec == nil) {
-        nsprintf(@"Could not load application specification for %s", path);
+        nsprintf(@"Could not load application specification for %s\n", path);
         return EXIT_FAILURE;
     }
     nsprintf(@"App Spec: %@\n", appSpec);
@@ -105,7 +105,7 @@
     if (version != nil) {
         sdkRoot = [DTiPhoneSimulatorSystemRoot rootWithSDKVersion: version];
         if (sdkRoot == nil) {
-            nsprintf(@"Can't find SDK for version %@", version);
+            nsprintf(@"Can't find SDK for version %@\n", version);
             return EXIT_FAILURE;
         }
     } else {
