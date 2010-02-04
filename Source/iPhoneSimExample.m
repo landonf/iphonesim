@@ -200,8 +200,19 @@
         argc -= optind;
         argv += optind;
 
+        /* Determine the absolute path */
+        char *absolute = realpath(argv[0], NULL);
+        NSString *appPath;
+        if (absolute == NULL) {
+            fprintf(stderr, "Could not determine absolute path for %s: %s", argv[0], strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+
+        appPath = [NSString stringWithUTF8String: absolute];
+        free(absolute);
+
         /* Don't exit, adds to runloop */
-        [self launchApp: [NSString stringWithUTF8String: argv[0]] sdkVersion: sdkVersion simulatedDeviceFamily: simulatedDeviceFamily];
+        [self launchApp: appPath sdkVersion: sdkVersion simulatedDeviceFamily: simulatedDeviceFamily];
     } else {
         fprintf(stderr, "Unknown command\n");
         [self printUsage];
